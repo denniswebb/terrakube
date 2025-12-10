@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class ExecutorService {
             log.info("Public Repository");
         }
 
-        HashMap<String, String> variables = new HashMap<>();
+        List<TerraformVariable> variables = new ArrayList<>();
         HashMap<String, String> environmentVariables = new HashMap<>();
         environmentVariables.put("TF_IN_AUTOMATION","1");
         List<Variable> variableList = job.getWorkspace().getVariable();
@@ -65,8 +66,8 @@ public class ExecutorService {
         if (variableList != null)
             for (Variable variable : variableList) {
                 if (variable.getCategory().equals(Category.TERRAFORM)) {
-                    log.info("Adding terraform");
-                    variables.put(variable.getKey(), variable.getValue());
+                    log.info("Adding terraform variable: {} (HCL: {})", variable.getKey(), variable.isHcl());
+                    variables.add(new TerraformVariable(variable.getKey(), variable.getValue(), variable.isHcl()));
                 } else {
                     log.info("Adding environment variable");
                     environmentVariables.put(variable.getKey(), variable.getValue());
@@ -77,8 +78,12 @@ public class ExecutorService {
         if (globalvarList != null)
             for (Globalvar globalvar : globalvarList) {
                 if (globalvar.getCategory().equals(Category.TERRAFORM)) {
-                    log.info("Adding terraform");
-                    variables.putIfAbsent(globalvar.getKey(), globalvar.getValue());
+                    // Only add if key doesn't already exist in variables list
+                    boolean keyExists = variables.stream().anyMatch(v -> v.getKey().equals(globalvar.getKey()));
+                    if (!keyExists) {
+                        log.info("Adding terraform global variable: {} (HCL: {})", globalvar.getKey(), globalvar.isHcl());
+                        variables.add(new TerraformVariable(globalvar.getKey(), globalvar.getValue(), globalvar.isHcl()));
+                    }
                 } else {
                     log.info("Adding environment variable");
                     environmentVariables.putIfAbsent(globalvar.getKey(), globalvar.getValue());

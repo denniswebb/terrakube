@@ -14,8 +14,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -45,7 +48,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             boolean scriptBeforeSuccessPlan;
             boolean scriptAfterSuccessPlan;
 
-            HashMap<String, String> terraformParametersPlan = getWorkspaceParameters(terraformJob.getVariables());
+            HashMap<String, String> terraformParametersPlan = getWorkspaceParameters(terraformJob.getVariables(), workingDirectory);
             HashMap<String, String> environmentVariablesPlan = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
             Consumer<String> outputPlan = getStringConsumer(jobOutput);
             Consumer<String> errorOutputPlan = getStringConsumer(jobErrorOutput);
@@ -93,7 +96,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         try {
             Consumer<String> output = getStringConsumer(terraformOutput);
             Consumer<String> errorOutput = getStringConsumer(terraformErrorOutput);
-            HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
+            HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables(), workingDirectory);
             HashMap<String, String> environmentVariables = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
 
             boolean execution = false;
@@ -300,6 +303,53 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     private HashMap<String, String> getWorkspaceParameters(HashMap<String, String> parameters) {
         return parameters != null ? parameters : new HashMap<>();
+    }
+
+    private HashMap<String, String> getWorkspaceParameters(List<org.terrakube.executor.service.mode.TerraformVariable> variables, File workingDirectory) {
+        HashMap<String, String> nonHclVariables = new HashMap<>();
+        List<org.terrakube.executor.service.mode.TerraformVariable> hclVariables = new ArrayList<>();
+
+        if (variables == null) {
+            return nonHclVariables;
+        }
+
+        // Separate HCL and non-HCL variables
+        for (org.terrakube.executor.service.mode.TerraformVariable variable : variables) {
+            if (variable.isHcl()) {
+                hclVariables.add(variable);
+                log.info("Found HCL variable: {}", variable.getKey());
+            } else {
+                nonHclVariables.put(variable.getKey(), variable.getValue());
+            }
+        }
+
+        // Write HCL variables to .auto.tfvars file
+        if (!hclVariables.isEmpty()) {
+            writeHclVariablesToFile(hclVariables, workingDirectory);
+        }
+
+        return nonHclVariables;
+    }
+
+    private void writeHclVariablesToFile(List<org.terrakube.executor.service.mode.TerraformVariable> hclVariables, File workingDirectory) {
+        try {
+            File tfvarsFile = new File(workingDirectory, "terrakube.auto.tfvars");
+            StringBuilder tfvarsContent = new StringBuilder();
+            tfvarsContent.append("# Terrakube HCL Variables - Auto-generated\n");
+            tfvarsContent.append("# This file is managed by Terrakube and should not be edited manually\n\n");
+
+            for (org.terrakube.executor.service.mode.TerraformVariable variable : hclVariables) {
+                tfvarsContent.append(variable.getKey())
+                        .append(" = ")
+                        .append(variable.getValue())
+                        .append("\n");
+            }
+
+            Files.write(tfvarsFile.toPath(), tfvarsContent.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            log.info("Created terrakube.auto.tfvars with {} HCL variables at: {}", hclVariables.size(), tfvarsFile.getAbsolutePath());
+        } catch (IOException e) {
+            log.error("Failed to write HCL variables to .auto.tfvars file", e);
+        }
     }
 
     @NotNull
