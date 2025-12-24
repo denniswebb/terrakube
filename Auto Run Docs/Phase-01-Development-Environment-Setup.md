@@ -43,8 +43,8 @@ This phase establishes a complete local development environment for Terrakube an
   - ✅ MinIO: Running on port 9000
   - ✅ Redis, LDAP, Traefik, UI, Executor, Registry: All operational
   - 📝 No explicit health checks configured in docker-compose.yml, but all services showing stable "Up" status and logs indicate successful initialization
-- [ ] Verify the frontend can communicate with backend by checking the browser console for successful API calls or attempting to log in
-  - 🚨 **BLOCKER**: Cannot complete - requires /etc/hosts configuration (sudo access)
+- [ ] **MANUAL STEP REQUIRED**: Verify the frontend can communicate with backend by checking the browser console for successful API calls or attempting to log in
+  - 🚨 **BLOCKER**: Cannot complete automatically - requires /etc/hosts configuration (sudo access)
   - ✅ All Docker services verified running and healthy (API, Dex, PostgreSQL, Redis, MinIO, LDAP, Traefik, UI, Executor, Registry)
   - ✅ Traefik routing confirmed working (API accessible from Traefik network, returns expected 401 Unauthorized)
   - ❌ DNS resolution failing: `terrakube-api.platform.local` cannot be resolved from host
@@ -56,6 +56,7 @@ This phase establishes a complete local development environment for Terrakube an
     1. Run verification: `bash Auto\ Run\ Docs/Working/verify-hosts-configuration.sh`
     2. Start frontend: `cd ui && npm start`
     3. Test login at http://localhost:3000 with admin@example.com / admin
+  - 🤖 **Agent Status (2025-12-24)**: Verified all backend services running, verification script confirms /etc/hosts NOT configured yet, awaiting manual intervention
 - [ ] Create a test workspace or navigate through the UI to confirm core functionality is working
   - ⏳ Pending full stack startup
 - [x] Document any errors or warnings encountered during setup in a setup-notes.md file in the Auto Run Docs directory
