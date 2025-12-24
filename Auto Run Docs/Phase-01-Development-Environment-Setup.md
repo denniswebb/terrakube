@@ -44,7 +44,13 @@ This phase establishes a complete local development environment for Terrakube an
   - ✅ Redis, LDAP, Traefik, UI, Executor, Registry: All operational
   - 📝 No explicit health checks configured in docker-compose.yml, but all services showing stable "Up" status and logs indicate successful initialization
 - [ ] Verify the frontend can communicate with backend by checking the browser console for successful API calls or attempting to log in
-  - ⏳ Pending both frontend and backend startup
+  - 🚨 **BLOCKER**: Cannot complete - requires /etc/hosts configuration (sudo access)
+  - ✅ All Docker services verified running and healthy (API, Dex, PostgreSQL, Redis, MinIO, LDAP, Traefik, UI, Executor, Registry)
+  - ❌ DNS resolution failing: `terrakube-api.platform.local` cannot be resolved
+  - ❌ Frontend cannot reach backend without domain resolution
+  - 📋 **Action Required**: Add /etc/hosts entries for `*.platform.local` domains pointing to `10.25.25.253`
+  - 📄 **Detailed Guide**: See `/Auto Run Docs/Working/MANUAL-HOSTS-CONFIGURATION-GUIDE.md`
+  - ⏳ **After /etc/hosts configured**: Start React dev server with `cd ui && npm start` and test login at http://localhost:3000
 - [ ] Create a test workspace or navigate through the UI to confirm core functionality is working
   - ⏳ Pending full stack startup
 - [x] Document any errors or warnings encountered during setup in a setup-notes.md file in the Auto Run Docs directory
