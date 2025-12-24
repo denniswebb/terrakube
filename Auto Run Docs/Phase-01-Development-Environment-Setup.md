@@ -46,11 +46,16 @@ This phase establishes a complete local development environment for Terrakube an
 - [ ] Verify the frontend can communicate with backend by checking the browser console for successful API calls or attempting to log in
   - 🚨 **BLOCKER**: Cannot complete - requires /etc/hosts configuration (sudo access)
   - ✅ All Docker services verified running and healthy (API, Dex, PostgreSQL, Redis, MinIO, LDAP, Traefik, UI, Executor, Registry)
-  - ❌ DNS resolution failing: `terrakube-api.platform.local` cannot be resolved
+  - ✅ Traefik routing confirmed working (API accessible from Traefik network, returns expected 401 Unauthorized)
+  - ❌ DNS resolution failing: `terrakube-api.platform.local` cannot be resolved from host
   - ❌ Frontend cannot reach backend without domain resolution
-  - 📋 **Action Required**: Add /etc/hosts entries for `*.platform.local` domains pointing to `10.25.25.253`
-  - 📄 **Detailed Guide**: See `/Auto Run Docs/Working/MANUAL-HOSTS-CONFIGURATION-GUIDE.md`
-  - ⏳ **After /etc/hosts configured**: Start React dev server with `cd ui && npm start` and test login at http://localhost:3000
+  - 📋 **Action Required**: Add /etc/hosts entries for `*.platform.local` domains
+  - 📄 **Configuration Guide**: `/Auto Run Docs/Working/MANUAL-HOSTS-CONFIGURATION-GUIDE.md`
+  - ✅ **Verification Script**: `/Auto Run Docs/Working/verify-hosts-configuration.sh` (run after configuring /etc/hosts)
+  - ⏳ **After /etc/hosts configured**:
+    1. Run verification: `bash Auto\ Run\ Docs/Working/verify-hosts-configuration.sh`
+    2. Start frontend: `cd ui && npm start`
+    3. Test login at http://localhost:3000 with admin@example.com / admin
 - [ ] Create a test workspace or navigate through the UI to confirm core functionality is working
   - ⏳ Pending full stack startup
 - [x] Document any errors or warnings encountered during setup in a setup-notes.md file in the Auto Run Docs directory
