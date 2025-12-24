@@ -30,7 +30,13 @@ This phase establishes a complete local development environment for Terrakube an
   - ✅ Located at `/docker-compose/docker-compose.yml`
   - Services: API, Dex, PostgreSQL, Redis, MinIO, LDAP, Traefik
 - [ ] Start all backend services using Docker Compose with `docker-compose up -d` from the appropriate directory
-  - ⏳ Requires: Docker Desktop running, network created, /etc/hosts configured, SSL certificates (optional)
+  - ⏳ Prerequisites status:
+    - ✅ Docker Desktop: Started successfully
+    - ✅ Docker Network: Created (terrakube-network with 10.25.25.0/24 subnet)
+    - ⚠️ /etc/hosts: **MANUAL STEP REQUIRED** - See `/Auto Run Docs/Working/MANUAL-STEP-REQUIRED.md`
+    - ⏳ SSL Certificates: Optional, can proceed without
+  - 📝 Ready to start once /etc/hosts is configured
+  - Command: `cd docker-compose && docker-compose up -d --force-recreate`
 - [ ] Wait for all containers to be healthy by running `docker-compose ps` and checking status
   - ⏳ Pending backend startup
 - [ ] Verify the frontend can communicate with backend by checking the browser console for successful API calls or attempting to log in

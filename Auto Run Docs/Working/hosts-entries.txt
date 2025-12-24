@@ -1,0 +1,5 @@
+# Terrakube local development
+10.25.25.253 terrakube.platform.local
+10.25.25.253 terrakube-api.platform.local
+10.25.25.253 terrakube-registry.platform.local
+10.25.25.253 terrakube-dex.platform.local

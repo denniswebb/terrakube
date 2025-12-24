@@ -45,20 +45,24 @@
   REACT_CONFIG_SCOPE=email openid profile offline_access groups
   ```
 
-## Backend Setup - ⏳ PENDING
+## Backend Setup - 🔄 IN PROGRESS
+
+### Completed Steps
+
+#### 1. Start Docker Desktop
+- **Status**: ✅ Completed
+- **Action**: Launched Docker Desktop application successfully
+- **Verification**: `docker ps` confirms daemon is running
+
+#### 2. Create Docker Network
+- **Status**: ✅ Completed
+- **Network**: terrakube-network (ID: 5909200c7de8)
+- **Configuration**: Bridge network with subnet 10.25.25.0/24, gateway 10.25.25.254
+- **Verification**: `docker network ls | grep terrakube` shows network exists
 
 ### Required Manual Steps
 
-#### 1. Start Docker Desktop
-- **Action**: Launch Docker Desktop application
-- **Verification**: Run `docker ps` to confirm daemon is running
-
-#### 2. Create Docker Network
-```bash
-docker network create terrakube-network -d bridge --subnet 10.25.25.0/24 --gateway 10.25.25.254
-```
-
-#### 3. Update /etc/hosts
+#### 3. Update /etc/hosts - ⚠️ REQUIRES USER ACTION
 Add the following entries to `/etc/hosts`:
 ```
 10.25.25.253 terrakube.platform.local
@@ -168,14 +172,22 @@ Expected behavior:
 1. ✅ Prerequisites verified (Java 25.0.1, Node.js 25.2.1, npm 11.6.2, Docker installed)
 2. ✅ Frontend dependencies installed
 3. ✅ Environment configuration created
-4. ⏳ Start Docker Desktop
-5. ⏳ Create Docker network
-6. ⏳ Configure /etc/hosts
+4. ✅ Docker Desktop started
+5. ✅ Docker network created (terrakube-network)
+6. ⚠️ **MANUAL ACTION REQUIRED**: Configure /etc/hosts - See `/Auto Run Docs/Working/MANUAL-STEP-REQUIRED.md`
 7. ⏳ (Optional) Generate SSL certificates
-8. ⏳ Start backend services with docker-compose
+8. ⏳ Start backend services with docker-compose (ready once /etc/hosts configured)
 9. ⏳ Start frontend development server
 10. ⏳ Test login and core functionality
 11. ⏳ Document working features
+
+## Current Blocker
+
+**The setup is blocked on /etc/hosts configuration** which requires sudo access and cannot be automated.
+
+See detailed instructions at: `/Auto Run Docs/Working/MANUAL-STEP-REQUIRED.md`
+
+Once you've added the /etc/hosts entries, the setup can continue automatically with docker-compose startup.
 
 ## Development Architecture
 
