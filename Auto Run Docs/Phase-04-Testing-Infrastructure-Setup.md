@@ -203,7 +203,39 @@ This phase establishes testing infrastructure for both frontend and backend, ens
     - Demo data provides realistic test scenarios with relationships (org → workspace → job)
     - Tests run fast (~49s for 91 tests) due to H2 in-memory database
     - No manual database setup required - Liquibase handles schema + data automatically
-- [ ] Check for any end-to-end tests in a separate e2e directory or test suite
+- [x] Check for any end-to-end tests in a separate e2e directory or test suite
+  - **Completed**: Comprehensive search for e2e testing infrastructure across project
+  - **Finding**: No dedicated e2e test framework (Cypress, Playwright, Selenium) configured
+  - **Alternative E2E Testing Found**: Thunder Client API testing collection
+    - **Location**: `/thunder-tests/` directory
+    - **Tool**: Thunder Client (VS Code REST API client extension)
+    - **Test Collections**:
+      - `thunderCollection.json`: Test organization with 28 folders/categories
+      - `thunderclient.json`: 199 API test requests (2940 lines)
+      - `thunderActivity.json`: Test execution history
+    - **Test Coverage Categories**:
+      - Step 0-16: Complete API workflow testing (Authentication → Organizations → Teams → Templates → Workspaces → Jobs → VCS → Modules → SSH → PAT → Context → Global Variables → Remote State → Agents)
+      - Terraform Protocol: Login, Module, Cloud operations
+      - Cloud Providers: AWS, Azure, GCP workspace examples with variables
+      - OpenAPI specification testing
+      - Dex authentication testing
+    - **Test Organization**: Organized by feature/workflow steps with nested folder structure
+    - **Authentication**: Bearer token authentication with `{{device_access_token}}` variable
+  - **CI/CD E2E Testing**: Not configured in GitHub Actions workflows
+    - **Backend Workflow** (`pull_request.yml`): Runs unit + integration tests via `mvn verify`
+    - **UI Workflow** (`pull_request_ui.yml`): Runs linting, formatting, and build - **NO test execution**
+    - **Gap Identified**: UI tests (`npm test`) not executed in CI/CD pipeline
+  - **Key Observations**:
+    - Thunder Client provides manual API e2e testing capability (not automated in CI)
+    - Integration tests in backend serve as partial e2e tests (API endpoints + database)
+    - No browser-based e2e testing for UI workflows (no Cypress/Playwright)
+    - Frontend unit tests exist but aren't run in CI/CD
+    - Manual testing workflow via Thunder Client collections for API validation
+  - **Recommendations for Contributors**:
+    - Use Thunder Client collections for manual API e2e testing during development
+    - Backend integration tests provide automated API endpoint validation
+    - Consider adding browser e2e tests (Playwright/Cypress) for critical UI workflows
+    - Add `npm test` step to UI workflow for automated frontend test execution in CI
 - [ ] Verify linting works by running `npm run lint` in the ui directory (if configured)
 - [ ] Check for code formatting configuration (Prettier, ESLint) and run formatting checks
 - [ ] Identify continuous integration configuration (.github/workflows, .gitlab-ci.yml) to understand CI/CD testing
