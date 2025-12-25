@@ -284,7 +284,60 @@ This phase establishes testing infrastructure for both frontend and backend, ens
     - Fix accessibility issues for WCAG compliance
     - Remove unused imports and variables for cleaner code
     - Consider enabling stricter TypeScript rules (@typescript-eslint/no-explicit-any)
-- [ ] Check for code formatting configuration (Prettier, ESLint) and run formatting checks
+- [x] Check for code formatting configuration (Prettier, ESLint) and run formatting checks
+  - **Completed**: Code formatting infrastructure identified and verified for frontend
+  - **Frontend Formatting Configuration**:
+    - **Prettier**: v3.7.4 configured with `.prettierrc` file
+    - **Configuration File**: `ui/.prettierrc`
+    - **Format Settings**:
+      - `singleQuote: false` (use double quotes)
+      - `printWidth: 120` (max line length)
+      - `semi: true` (require semicolons)
+      - `trailingComma: "es5"` (trailing commas where valid in ES5)
+      - `endOfLine: "lf"` (Unix line endings)
+    - **NPM Scripts**:
+      - `npm run format:check`: Check formatting without modifying files
+      - `npm run format`: Auto-fix formatting issues with --write flag
+      - `npm run format:modules:check`: Check only src/modules directory
+      - `npm run format:modules`: Auto-fix only src/modules directory
+  - **ESLint + Prettier Integration**:
+    - **Plugin**: eslint-plugin-prettier v5.5.4 integrated in eslint.config.js
+    - **Config**: eslint-config-prettier v10.1.8 (disables conflicting ESLint rules)
+    - **Integration**: Prettier rules enforced through ESLint via recommended config
+    - **Benefit**: Single command (`npm run lint`) checks both code quality and formatting
+  - **Formatting Check Results**:
+    - **Command used**: `cd ui && npm run format:check`
+    - **Issues Found**: 13 files with formatting violations
+    - **Exit Code**: 1 (formatting issues detected)
+    - **Files with Issues**:
+      - src/domain/Jobs/Details.tsx
+      - src/domain/Modules/Create.tsx
+      - src/domain/Settings/AddVCS.tsx
+      - src/domain/Settings/CreateEditCollection.tsx
+      - src/domain/Settings/EditTeam.tsx
+      - src/domain/Settings/TeamPermissions.css
+      - src/domain/Settings/TeamPermissions.tsx
+      - src/domain/Settings/VariableCollections.tsx
+      - src/domain/Settings/VCS.tsx
+      - src/domain/Workspaces/Create.tsx
+      - src/domain/Workspaces/Details.tsx
+      - src/domain/Workspaces/Import.tsx
+      - src/domain/Workspaces/Settings/General.tsx
+  - **Backend Formatting Configuration**:
+    - **Finding**: No Java code formatter configured (no Spotless, Checkstyle, or Google Java Format)
+    - **Maven POM**: Only JaCoCo (coverage) and SonarCloud plugins configured
+    - **EditorConfig**: No root .editorconfig file for cross-editor consistency
+    - **Implication**: Java code formatting relies on developer IDE settings (not enforced)
+  - **Key Observations**:
+    - Frontend has comprehensive formatting infrastructure (Prettier + ESLint integration)
+    - 13 files need formatting fixes (can be auto-fixed with `npm run format`)
+    - Backend lacks automated code formatting enforcement
+    - No CI/CD formatting checks configured (only linting in workflows)
+  - **Recommendations**:
+    - Run `npm run format` to auto-fix 13 frontend formatting issues before contributions
+    - Consider adding Prettier format check to CI/CD workflow (ui pull_request workflow)
+    - Consider adding Java formatter (Spotless or Checkstyle) to backend for consistency
+    - Add .editorconfig to project root for cross-language editor consistency
 - [ ] Identify continuous integration configuration (.github/workflows, .gitlab-ci.yml) to understand CI/CD testing
 - [ ] Document the testing strategy in testing-guide.md in Auto Run Docs including how to run tests and write new ones
 - [ ] Create a checklist of quality gates to run before submitting contributions (tests, linting, formatting)
