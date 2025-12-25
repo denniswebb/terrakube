@@ -151,7 +151,58 @@ This phase establishes testing infrastructure for both frontend and backend, ens
     - Tests focus on business logic, not Spring integration (unit tests, not integration tests)
     - Comprehensive mocking allows testing without database or external services
     - Clear separation between unit tests (mocked dependencies) and configuration tests (Spring context)
-- [ ] Look for integration tests that test API endpoints with a test database
+- [x] Look for integration tests that test API endpoints with a test database
+  - **Completed**: Comprehensive integration test suite identified in api/src/test/java/io/terrakube/api/
+  - **Integration Test Files Found**: 16 test classes using REST Assured for API endpoint testing
+  - **Key Test Files**:
+    - `ServerApplicationTests.java`: Base class for all integration tests with Spring Boot test setup
+    - `OrganizationTests.java`: Organization API endpoint tests (4 tests)
+    - `WorkspaceTests.java`: Workspace API endpoint tests (15 tests)
+    - `JobTests.java`, `TeamTests.java`, `VcsTests.java`, `ModuleTests.java`, `ProviderTests.java`, etc.
+  - **Integration Testing Framework Stack**:
+    - **@SpringBootTest**: Full Spring application context with `WebEnvironment.RANDOM_PORT`
+    - **REST Assured**: Fluent API testing library for HTTP endpoint validation
+    - **WireMock**: HTTP mocking for external service integration
+    - **H2 Database**: In-memory test database configured via `application-test.properties`
+    - **Liquibase**: Database schema and demo data setup using `changelog-demo.xml`
+    - **@ActiveProfiles("test")**: Activates test-specific configuration profile
+  - **Integration Test Patterns**:
+    - **Base Class Pattern**: All integration tests extend `ServerApplicationTests` for shared setup
+    - **@BeforeAll Setup**: Initializes REST Assured port and WireMock server (per-class lifecycle)
+    - **@AfterAll Cleanup**: Stops WireMock server after all tests complete
+    - **Mock Redis**: `@MockBean RedisTemplate` to avoid external Redis dependency
+    - **JWT Token Generation**: Helper methods `generatePAT()` and `generateSystemToken()` for authentication
+    - **Test Data**: Liquibase demo data provides pre-populated test entities with known UUIDs
+  - **API Testing Pattern**:
+    - **Given-When-Then**: REST Assured fluent API (`given()...when()...then()`)
+    - **Authorization Headers**: JWT tokens generated for different user roles (TERRAKUBE_ADMIN, TERRAKUBE_DEVELOPERS, FAKE_GROUP)
+    - **JSON:API Format**: Request/response validation using `application/vnd.api+json` content type
+    - **HTTP Status Assertions**: Validate response codes (200 OK, 201 CREATED, 403 FORBIDDEN, 401 UNAUTHORIZED)
+    - **Response Body Assertions**: Hamcrest matchers for JSON path validation (e.g., `equalTo()`)
+    - **CRUD Operations**: Full lifecycle tests (Create, Read, Update, Delete operations)
+    - **Permission Testing**: Verify authorization rules for different user roles
+  - **Test Database Configuration** (application-test.properties):
+    - **Database Type**: H2 in-memory database (`io.terrakube.api.plugin.datasource.type=H2`)
+    - **Schema Management**: Liquibase enabled with `spring.liquibase.change-log=classpath:/db/changelog/changelog-demo.xml`
+    - **Demo Data**: Pre-populated organizations, workspaces, teams, jobs via Liquibase changesets
+    - **Naming Strategy**: Standard physical naming (not snake_case conversion)
+    - **Quartz**: JDBC job store for scheduled task testing
+  - **External Service Mocking**:
+    - **WireMock Server**: Dynamic port allocation for mocking external HTTP services
+    - **Redis Mock**: MockBean for Redis operations (no actual Redis required)
+    - **Executor Service**: Mocked executor URL for job execution tests
+  - **Test Data Management**:
+    - **Known UUIDs**: Fixed entity IDs from Liquibase demo data (e.g., organization `d9b58bd3-f3fc-4056-a026-1163297e80a8`)
+    - **File System State**: Tests create/cleanup Terraform state files in `.terraform-spring-boot/local/backend/`
+    - **Team Permissions**: Tests modify team permissions dynamically (e.g., `setManageState(true)`)
+    - **Test Isolation**: Each test operates on known entities, cleanup performed in some tests (e.g., workspace deletion)
+  - **Key Observations**:
+    - Integration tests validate full request-response cycle with real database
+    - Tests cover API authorization, JSON:API compliance, business logic
+    - WireMock enables testing external integrations without live services
+    - Demo data provides realistic test scenarios with relationships (org → workspace → job)
+    - Tests run fast (~49s for 91 tests) due to H2 in-memory database
+    - No manual database setup required - Liquibase handles schema + data automatically
 - [ ] Check for any end-to-end tests in a separate e2e directory or test suite
 - [ ] Verify linting works by running `npm run lint` in the ui directory (if configured)
 - [ ] Check for code formatting configuration (Prettier, ESLint) and run formatting checks
