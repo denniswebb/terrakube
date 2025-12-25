@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -200,7 +202,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     .processLogs(logsService)
                     .build();
 
-            HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
+            HashMap<String, String> terraformParameters = processVariables(terraformJob.getVariables(), terraformWorkingDir);
 
             boolean execution = false;
             boolean scriptBeforeSuccess;

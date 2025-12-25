@@ -491,4 +491,108 @@ This phase establishes testing infrastructure for both frontend and backend, ens
     - 40+ individual checkpoints across all phases
     - Quick reference commands for immediate execution
     - Links to testing-guide.md and other resources
-- [ ] Identify any gaps in test coverage that should be addressed when fixing bugs or adding features
+- [x] Identify any gaps in test coverage that should be addressed when fixing bugs or adding features
+  - **Completed**: Comprehensive test coverage gap analysis performed for both frontend and backend
+
+  - **Frontend Test Coverage Gaps**:
+    - **Overall Coverage**: Excellent metrics (98.96% statements, 97.61% branches, 100% functions, 98.91% lines)
+    - **Test File Ratio**: Only 3 test files for 96 source files (~3% coverage by file count)
+    - **Missing Test Categories**:
+      - **React Components**: 0 component tests (55+ component files untested)
+        - No tests for domain components: Jobs, Modules, Organizations, Settings, Workspaces, Login
+        - No tests for module components: OrganizationGrid, TokenGrid, WorkspaceCard, RunList, etc.
+        - All `.tsx` components lack test coverage
+      - **Services/API Layer**: 0 tests for API integration
+        - `apiWrapper.ts`, `useApiRequest.ts` untested
+        - Organization, user, workspace services untested
+      - **Reducers/State Management**: 0 tests for Redux state
+        - `reducers/organization/index.ts`, `reducers/user/index.ts` untested
+      - **Configuration**: 0 tests for config modules
+        - `authConfig.ts`, `axiosConfig.ts`, `monacoConfig.ts`, `themeConfig.ts` untested
+      - **Utility Functions**: Partial coverage
+        - Only 3 utility functions tested (VCS URL parsing)
+        - `getDeterministicColors.ts`, `isLightColor.ts`, `stringToDeterministicColor.ts` untested
+    - **Existing Test Coverage**: Only VCS URL utility functions (`formatSshUrl`, `getVcsNameFromUrl`, `getVcsTypeFromUrl`)
+    - **Critical Gap**: One uncovered line in `getVcsTypeFromUrl.ts:19` (edge case handling)
+
+  - **Backend Test Coverage Gaps**:
+    - **Overall Coverage**: Moderate (91 tests across 3 modules, but only 24 test files for 293 source files = 8% coverage by file count)
+    - **API Module Coverage**:
+      - **Integration Tests**: Good coverage (16 integration test files testing REST API endpoints)
+      - **Unit Tests**: Limited (6 unit test files)
+      - **Missing Test Categories**:
+        - **Service Layer**: Partial coverage
+          - Only 2 service tests (`ScheduleJobTest`, `PersistentExecutorServiceTest`)
+          - Many services untested: SSH key service, VCS service, module service, provider service, etc.
+        - **Controllers**: No dedicated controller unit tests (only integration tests via REST Assured)
+        - **Repository Layer**: No repository tests (relies on integration tests with H2)
+        - **Configuration**: Only 1 configuration test (`StreamingPropertiesTest`)
+        - **Mappers/DTOs**: No tests for data transformation logic
+        - **Security/Authorization**: Only tested via integration tests, no unit tests for permission logic
+        - **Plugins**: No tests for plugin interfaces (Terraform state, VCS integrations)
+    - **Registry Module Coverage**: Minimal (3 tests total for entire registry functionality)
+    - **Executor Module Coverage**: Minimal (3 tests total for entire executor service)
+      - **Critical Gap**: Terraform execution logic untested
+      - No tests for script execution, workspace setup, logging services
+
+  - **Cross-Cutting Gaps**:
+    - **E2E Testing**: No browser-based E2E tests (no Cypress/Playwright for UI)
+    - **Performance Testing**: No performance or load tests
+    - **Accessibility Testing**: No automated WCAG compliance tests (linting only)
+    - **Visual Regression**: No screenshot/visual diff testing
+    - **Error Handling**: Error paths underrepresented in existing tests
+    - **Edge Cases**: Limited edge case coverage (e.g., network failures, timeouts, malformed data)
+
+  - **CI/CD Testing Gaps**:
+    - **Frontend CI**: Tests exist but NOT executed in CI/CD pipeline (missing `npm test` step)
+    - **Backend CI**: Integration tests run but code coverage not published to SonarCloud for all modules
+    - **Release Pipeline**: Tests skipped entirely in release workflow (`-Dmaven.test.skip=true`)
+
+  - **Recommendations for Contributors**:
+    1. **Frontend Priority Areas**:
+       - Add React component tests for critical user workflows (workspace creation, job execution, VCS setup)
+       - Test API integration layer (`apiWrapper`, `useApiRequest`) for error handling
+       - Add tests for Redux reducers and state management
+       - Achieve >80% coverage for utility functions (currently only VCS utils tested)
+       - Fix uncovered line in `getVcsTypeFromUrl.ts:19`
+
+    2. **Backend Priority Areas**:
+       - Add unit tests for service layer business logic (job scheduling, workspace management, module handling)
+       - Test security/authorization logic independently from integration tests
+       - Add tests for Terraform executor service (critical path currently untested)
+       - Improve registry and executor module test coverage (currently minimal)
+       - Add repository layer tests for data access patterns
+
+    3. **Testing Infrastructure Improvements**:
+       - Add `npm test -- --watchAll=false` to frontend CI workflow
+       - Enable code coverage publishing for all backend modules
+       - Add E2E tests for critical user journeys (Playwright for UI, API integration tests)
+       - Add performance benchmarks for Terraform execution and API response times
+       - Consider adding mutation testing to validate test quality
+
+    4. **Quality Gates**:
+       - Require tests for all new features (no new code without corresponding tests)
+       - Enforce minimum coverage thresholds: Frontend 80%, Backend 70%
+       - Run tests in release workflow (remove `-Dmaven.test.skip=true`)
+       - Add coverage trend tracking to prevent regression
+
+  - **Test Coverage Summary**:
+    ```
+    Frontend:
+    - Source Files: 96
+    - Test Files: 3 (3% coverage by file count)
+    - Line Coverage: 98.91% (misleadingly high - only 3 files tested)
+    - Missing: Components, Services, Reducers, Config
+
+    Backend:
+    - Source Files: 293 (API module)
+    - Test Files: 24 (8% coverage by file count)
+    - Test Count: 91 tests (85 API, 3 Registry, 3 Executor)
+    - Missing: Service layer, Controllers, Repositories, Executor logic
+
+    Overall:
+    - Strong integration test foundation (API endpoints well covered)
+    - Weak unit test coverage (components, services, business logic)
+    - No E2E testing for UI workflows
+    - Tests not enforced in CI for frontend
+    ```
