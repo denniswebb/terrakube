@@ -446,5 +446,49 @@ This phase establishes testing infrastructure for both frontend and backend, ens
     - Links to external documentation resources
     - Clear separation of frontend vs backend practices
     - Troubleshooting section for common issues
-- [ ] Create a checklist of quality gates to run before submitting contributions (tests, linting, formatting)
+- [x] Create a checklist of quality gates to run before submitting contributions (tests, linting, formatting)
+  - **Completed**: Comprehensive quality gates checklist created in `quality-gates-checklist.md`
+  - **File Location**: `/Auto Run Docs/quality-gates-checklist.md`
+  - **Checklist Sections**:
+    - Quick Reference: Fast command lookup for frontend/backend validation
+    - Phase 1 - Code Quality: Tests, coverage, linting, formatting, build verification
+    - Phase 2 - Code Review: Self-review criteria for code changes
+    - Phase 3 - Documentation: Code documentation and change description requirements
+    - Phase 4 - Git Hygiene: Branch management, commit quality, clean history
+    - Phase 5 - Integration Validation: Local integration testing, API testing, database migrations
+    - Phase 6 - Performance & Security: Performance considerations, security review, accessibility
+    - Phase 7 - CI/CD Preparation: CI/CD compatibility, pre-push validation
+    - Quick Validation Scripts: One-command validation for frontend, backend, and full project
+    - Troubleshooting: Common quality gate failure solutions
+    - Minimum Required Gates: Must-pass gates for PR submission
+  - **Frontend Pre-Submission Commands**:
+    ```bash
+    cd ui
+    npm test -- --watchAll=false          # Run all tests
+    npm test -- --coverage --watchAll=false  # Generate coverage report
+    npm run lint:check                    # Check for linting issues
+    npm run lint                          # Auto-fix linting issues
+    npm run format:check                  # Check formatting
+    npm run format                        # Auto-fix formatting
+    npm run build                         # Verify production build
+    ```
+  - **Backend Pre-Submission Commands**:
+    ```bash
+    mvn clean test                        # Run all unit tests
+    mvn verify                            # Run tests + integration tests
+    mvn clean verify                      # Clean build with all tests
+    ```
+  - **Key Features**:
+    - Complete phase-by-phase quality validation workflow
+    - One-command validation scripts for quick checks
+    - Troubleshooting guide for common failures
+    - Minimum required gates clearly identified
+    - Integration with existing testing infrastructure
+    - Security, performance, and accessibility considerations
+    - Git workflow best practices included
+  - **Coverage**:
+    - 7 quality gate phases covering all aspects of contribution quality
+    - 40+ individual checkpoints across all phases
+    - Quick reference commands for immediate execution
+    - Links to testing-guide.md and other resources
 - [ ] Identify any gaps in test coverage that should be addressed when fixing bugs or adding features
