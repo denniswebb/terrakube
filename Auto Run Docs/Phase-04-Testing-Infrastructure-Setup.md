@@ -414,6 +414,37 @@ This phase establishes testing infrastructure for both frontend and backend, ens
     - Cache strategy optimizes build times (Maven + npm dependencies)
     - Multi-platform support (amd64 + arm64) in release pipeline
     - Release workflow prioritizes speed over testing (tests skipped)
-- [ ] Document the testing strategy in testing-guide.md in Auto Run Docs including how to run tests and write new ones
+- [x] Document the testing strategy in testing-guide.md in Auto Run Docs including how to run tests and write new ones
+  - **Completed**: Comprehensive testing guide created with 600+ lines covering all testing infrastructure
+  - **File Location**: `/Auto Run Docs/testing-guide.md`
+  - **Sections Included**:
+    - Quick Start: Commands to run frontend and backend tests immediately
+    - Frontend Testing: Jest/React Testing Library setup, patterns, and examples
+    - Backend Testing: JUnit/Mockito/Spring Test patterns with unit and integration test examples
+    - Integration Testing: H2 database config, WireMock setup, authentication patterns
+    - API Testing: Thunder Client collections documentation (manual E2E testing)
+    - CI/CD Testing: GitHub Actions workflows and current testing enforcement
+    - Quality Gates: Pre-submission checklist with all required commands
+    - Writing New Tests: Complete templates for frontend and backend tests
+    - Best Practices: Testing principles, patterns, and coverage guidelines
+    - Troubleshooting: Common issues and solutions
+  - **Key Features**:
+    - Complete command reference for running all test types
+    - Code templates for unit tests, component tests, and integration tests
+    - Detailed explanation of testing patterns found in codebase analysis
+    - Pre-submission quality gates checklist with exact commands
+    - Identification of testing gaps (frontend tests not in CI, no E2E browser tests)
+    - Coverage metrics and quality standards documentation
+  - **Test Execution Coverage**:
+    - Frontend: Jest 30.2.0, 17 existing tests, 98%+ coverage
+    - Backend: JUnit 5, 91 tests across 3 modules, all passing
+    - Integration: REST Assured API tests with H2 database
+    - Manual API Testing: Thunder Client with 199 requests
+  - **Documentation Quality**:
+    - Table of contents for easy navigation
+    - Practical examples with real code snippets
+    - Links to external documentation resources
+    - Clear separation of frontend vs backend practices
+    - Troubleshooting section for common issues
 - [ ] Create a checklist of quality gates to run before submitting contributions (tests, linting, formatting)
 - [ ] Identify any gaps in test coverage that should be addressed when fixing bugs or adding features
