@@ -103,7 +103,54 @@ This phase establishes testing infrastructure for both frontend and backend, ens
     - Registry and Executor modules use simplified testing setup
     - JaCoCo coverage reporting integrated with SonarCloud
     - All modules inherit from Spring Boot parent (v3.5.7) for consistent testing framework versions
-- [ ] Examine 2-3 existing backend unit tests to understand mocking patterns and test structure
+- [x] Examine 2-3 existing backend unit tests to understand mocking patterns and test structure
+  - **Completed**: Analyzed 3 backend test files to understand testing patterns
+  - **Files Analyzed**:
+    - `ScheduleJobTest.java` (26 test methods, 667 lines) - Complex service integration testing
+    - `PersistentExecutorServiceTest.java` (6 test methods, 175 lines) - HTTP client mocking patterns
+    - `StreamingPropertiesTest.java` (1 test method, 54 lines) - Configuration properties testing
+  - **Testing Framework Stack**:
+    - **JUnit 5**: `@Test`, `@BeforeEach`, `@ExtendWith(MockitoExtension.class)`
+    - **Mockito**: Extensive mocking with `mock()`, `doReturn()`, `verify()`, `times()`
+    - **AssertJ**: Fluent assertions with `assertThat()` API
+    - **Spring Test**: `ApplicationContextRunner` for configuration testing
+  - **Mocking Patterns Identified**:
+    - **Custom Mock Answer**: `FailUnkownMethod<T>` helper class ensures strict mocking (any unmocked method throws exception)
+    - **Setup Method Pattern**: `@BeforeEach setup()` initializes all mocks consistently
+    - **Subject Factory**: Private `subject()` method constructs service under test with mocked dependencies
+    - **Test Data Builders**: Private helper methods like `job(JobStatus)`, `jobOnDefaultExecutor()` create test fixtures
+    - **Mockito Static Imports**: Extensive use of static imports for cleaner test code (`doReturn`, `verify`, `any`, `times`)
+    - **Argument Matchers**: `any()`, `anyString()`, `anyInt()`, `anyList()` for flexible matching
+    - **Behavior Verification**: `verify(mock, times(n)).method()` to assert interaction counts
+    - **Exception Testing**: `assertThrows(ExceptionClass.class, () -> method())` for exception scenarios
+  - **Test Structure Conventions**:
+    - **Arrange-Act-Assert**: Clear three-phase structure in each test method
+    - **Given-When-Then**: Implicit pattern through mock setup, action, and verification
+    - **Descriptive Names**: Test method names describe scenarios (e.g., `expiredJobsAreDescheduled`, `propagatesMalformedUri`)
+    - **Single Responsibility**: Each test validates one specific behavior or edge case
+    - **Comprehensive Coverage**: Tests cover success paths, failure paths, edge cases, and error handling
+  - **Advanced Mocking Techniques**:
+    - **doAnswer()**: Custom behavior injection for complex mock responses (e.g., setting ID on saved entity)
+    - **doThrow()**: Exception simulation for failure scenarios
+    - **doNothing()**: Void method mocking for services with no return value
+    - **Mock Chains**: WebClient builder pattern fully mocked with chained method calls
+    - **Generic Suppression**: `@SuppressWarnings("unchecked")` for generic type safety in mocks
+  - **Configuration Testing Pattern**:
+    - **ApplicationContextRunner**: Spring Boot test context for property binding validation
+    - **@EnableConfigurationProperties**: Enables configuration class loading in test context
+    - **Property Values**: `.withPropertyValues()` injects test configuration
+    - **Fluent Assertions**: AssertJ `assertThat()` with property accessors for readable assertions
+  - **Test Data Management**:
+    - Domain objects (Job, Workspace, Organization) constructed programmatically
+    - UUIDs generated for test data uniqueness
+    - Collections (Lists, Maps) used for complex test scenarios
+    - Optional wrapping for repository return values
+  - **Key Observations**:
+    - Heavy use of Mockito for dependency isolation
+    - FailUnkownMethod ensures strict test discipline (no accidental behavior)
+    - Tests focus on business logic, not Spring integration (unit tests, not integration tests)
+    - Comprehensive mocking allows testing without database or external services
+    - Clear separation between unit tests (mocked dependencies) and configuration tests (Spring context)
 - [ ] Look for integration tests that test API endpoints with a test database
 - [ ] Check for any end-to-end tests in a separate e2e directory or test suite
 - [ ] Verify linting works by running `npm run lint` in the ui directory (if configured)
