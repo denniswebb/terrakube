@@ -338,7 +338,82 @@ This phase establishes testing infrastructure for both frontend and backend, ens
     - Consider adding Prettier format check to CI/CD workflow (ui pull_request workflow)
     - Consider adding Java formatter (Spotless or Checkstyle) to backend for consistency
     - Add .editorconfig to project root for cross-language editor consistency
-- [ ] Identify continuous integration configuration (.github/workflows, .gitlab-ci.yml) to understand CI/CD testing
+- [x] Identify continuous integration configuration (.github/workflows, .gitlab-ci.yml) to understand CI/CD testing
+  - **Completed**: Comprehensive CI/CD configuration identified in GitHub Actions
+  - **CI Platform**: GitHub Actions (no GitLab CI configuration found)
+  - **Workflow Files**:
+    - `.github/workflows/pull_request.yml`: Backend build and testing workflow
+    - `.github/workflows/pull_request_ui.yml`: Frontend build, linting, and formatting workflow
+    - `.github/workflows/release.yml`: Release workflow for Docker image publishing
+
+  - **Backend CI Workflow** (pull_request.yml):
+    - **Triggers**: Push to main branch, pull request events (opened, synchronize, reopened)
+    - **Jobs**:
+      - `build-jammy`: Standard Ubuntu build with Java 25 (Liberica distribution)
+      - `build-alpaquita`: Alpaquita Linux build (only on main branch pushes)
+    - **Java Setup**: JDK 25 (Liberica distribution)
+    - **Build Command**: `mvn -B verify --file pom.xml` (includes tests via Maven verify phase)
+    - **Testing**: All backend tests executed during verify phase (91 tests across 3 modules)
+    - **Code Quality**: SonarCloud integration with sonar-maven-plugin for code analysis
+    - **Cache Strategy**: Maven packages (~/.m2) and SonarCloud packages cached for performance
+    - **Fork Handling**: Different build steps for fork PRs (clean install only) vs repository PRs (verify + SonarCloud)
+    - **Environment Variables**: USER_NAME, ACCESS_TOKEN, SONAR_TOKEN, GITHUB_TOKEN for authentication
+    - **Shallow Clones Disabled**: fetch-depth: 0 for better SonarCloud analysis accuracy
+
+  - **Frontend CI Workflow** (pull_request_ui.yml):
+    - **Triggers**: Push to main, pull requests with changes in `ui/**` directory (path filtering)
+    - **Node Version**: 22.x (via matrix strategy for future multi-version support)
+    - **Working Directory**: ./ui (all commands run in ui subdirectory)
+    - **Steps**:
+      1. **Dependency Installation**: `yarn install --frozen-lockfile` (ensures reproducible builds)
+      2. **Linting**: `yarn lint:modules:check` (checks src/modules directory only)
+      3. **Formatting**: `yarn format:modules:check` (checks Prettier formatting compliance)
+      4. **Build**: `npm run build --if-present` (creates production build)
+    - **Environment**: CI=false to allow warnings during build
+    - **Cache**: npm cache via actions/setup-node with cache-dependency-path: ui/package.json
+    - **Testing Gap**: No `npm test` step (frontend tests not executed in CI/CD)
+
+  - **Release Workflow** (release.yml):
+    - **Trigger**: GitHub release created event
+    - **Matrix Strategy**: 3 OS variants (jammy, jammy-arm, alpaquita)
+    - **Runners**: ubuntu-24.04 (jammy/alpaquita), ubuntu-24.04-arm (jammy-arm)
+    - **Steps**:
+      1. Build UI Docker images (jammy and jammy-arm only)
+      2. Update POM version to release tag
+      3. Build backend Spring Boot images with Maven (tests skipped: -Dmaven.test.skip=true)
+      4. Tag and push images to Docker Hub (azbuilder organization)
+      5. Merge multi-platform images (amd64 + arm64) using docker buildx
+      6. Clean up temporary ARM-tagged images from Docker Hub
+    - **Image Naming**: azbuilder/api-server, azbuilder/executor, azbuilder/open-registry, azbuilder/terrakube-ui
+    - **Version Tagging**: Both version tag (e.g., 2.0.0) and latest tag applied
+    - **Testing in Release**: Tests skipped for release builds (prioritizes build speed)
+
+  - **CI/CD Testing Summary**:
+    - **Backend Testing**: ✅ Comprehensive (91 tests run on every PR via mvn verify)
+    - **Frontend Testing**: ❌ Gap identified (tests exist but not run in CI/CD)
+    - **Linting**: ✅ Frontend linting enforced (371 issues currently in codebase)
+    - **Formatting**: ✅ Frontend formatting enforced (13 files with violations)
+    - **Code Quality**: ✅ SonarCloud integration for backend code analysis
+    - **Build Validation**: ✅ Both frontend and backend builds validated
+    - **Release Testing**: ❌ Tests skipped in release workflow for speed
+
+  - **Quality Gates Enforced in CI**:
+    - Backend: Build + Test + SonarCloud analysis (for repository PRs)
+    - Frontend: Linting + Formatting + Build (tests missing)
+
+  - **CI/CD Optimization Opportunities**:
+    - Add `npm test -- --watchAll=false` to frontend CI workflow
+    - Consider running backend tests in release workflow (or separate pre-release test job)
+    - Add code coverage reporting to frontend CI
+    - Consider adding performance testing or E2E tests to CI pipeline
+
+  - **Key Observations**:
+    - Backend has robust CI testing pipeline with quality gates
+    - Frontend CI focuses on code style/format, missing actual test execution
+    - Fork PRs have reduced CI (no SonarCloud) to protect secrets
+    - Cache strategy optimizes build times (Maven + npm dependencies)
+    - Multi-platform support (amd64 + arm64) in release pipeline
+    - Release workflow prioritizes speed over testing (tests skipped)
 - [ ] Document the testing strategy in testing-guide.md in Auto Run Docs including how to run tests and write new ones
 - [ ] Create a checklist of quality gates to run before submitting contributions (tests, linting, formatting)
 - [ ] Identify any gaps in test coverage that should be addressed when fixing bugs or adding features
