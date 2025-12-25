@@ -77,7 +77,32 @@ This phase establishes testing infrastructure for both frontend and backend, ens
     - registry-server: 3 tests passed
     - executor-service: 3 tests passed
   - **Build success**: No test failures, compilation successful after import fix
-- [ ] Review the backend testing setup and identify testing frameworks used (JUnit, Mockito, etc.)
+- [x] Review the backend testing setup and identify testing frameworks used (JUnit, Mockito, etc.)
+  - **Completed**: Backend testing framework identified from Maven POM files
+  - **Primary Testing Framework**: JUnit (via spring-boot-starter-test)
+  - **Testing Dependencies**:
+    - **JUnit 5 (Jupiter)**: Core testing framework included in spring-boot-starter-test
+    - **Mockito**: Mocking framework included in spring-boot-starter-test
+    - **Spring Test**: Spring testing utilities (spring-boot-starter-test)
+    - **Spring Security Test**: Security testing support (spring-security-test) in API module
+    - **AssertJ**: Fluent assertions included in spring-boot-starter-test
+    - **Hamcrest**: Matcher library included in spring-boot-starter-test
+    - **JSONassert**: JSON comparison included in spring-boot-starter-test
+    - **JsonPath**: JSON path queries included in spring-boot-starter-test
+  - **API-Specific Testing Tools**:
+    - **REST Assured (v5.5.6)**: API testing library for REST endpoints
+    - **WireMock Spring Boot (v4.0.8)**: HTTP mocking for integration tests
+    - **Elide Test Helpers (v7.1.15)**: Testing utilities for Elide framework
+    - **Handlebars (v4.3.1)**: Template testing support
+  - **Test Database**: H2 in-memory database for testing (scope: runtime)
+  - **Code Coverage**: JaCoCo Maven Plugin (v0.8.14) configured at platform level
+  - **Test Scope**: All modules (api-server with 85 tests, registry-server with 3 tests, executor-service with 3 tests)
+  - **Key Observations**:
+    - Spring Boot Test starter provides comprehensive testing stack
+    - API module has most extensive testing setup with REST API testing tools
+    - Registry and Executor modules use simplified testing setup
+    - JaCoCo coverage reporting integrated with SonarCloud
+    - All modules inherit from Spring Boot parent (v3.5.7) for consistent testing framework versions
 - [ ] Examine 2-3 existing backend unit tests to understand mocking patterns and test structure
 - [ ] Look for integration tests that test API endpoints with a test database
 - [ ] Check for any end-to-end tests in a separate e2e directory or test suite
